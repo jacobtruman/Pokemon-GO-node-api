@@ -68,6 +68,7 @@ function getNeighbors(lat, lng) {
 
 function Pokeio() {
   var self = this;
+  self.pokemonProto = pokemonProto;
   self.events = new EventEmitter();
   self.j = request.jar();
   self.request = request.defaults({
@@ -533,6 +534,89 @@ function Pokeio() {
     });
   };
 
+  self.SetFavoritePokemon = function (pokemonId, favorite, callback) {
+    var _self$playerInfo3 = self.playerInfo;
+    var apiEndpoint = _self$playerInfo3.apiEndpoint;
+    var accessToken = _self$playerInfo3.accessToken;
+
+    var setFavoritePokemon = new RequestEnvelop.SetFavoritePokemonMessage({
+      'pokemon_id': pokemonId,
+      'is_favorite': favorite
+    });
+
+    var req = new RequestEnvelop.Requests(148, setFavoritePokemon.encode().toBuffer());
+
+    api_req(apiEndpoint, accessToken, req, function (err, f_ret) {
+      if (err) {
+        return callback(err);
+      } else if (!f_ret || !f_ret.payload || !f_ret.payload[0]) {
+        return callback('No result');
+      }
+
+      var dErr, response;
+      try {
+        response = ResponseEnvelop.SetFavoritePokemonResponse.decode(f_ret.payload[0]);
+      } catch (err) {
+        dErr = err;
+      }
+      callback(dErr, response);
+    });
+  };
+
+  self.GetHatchedEggs = function (callback) {
+    var _self$playerInfo3 = self.playerInfo;
+    var apiEndpoint = _self$playerInfo3.apiEndpoint;
+    var accessToken = _self$playerInfo3.accessToken;
+
+    var getHatchedEggs = new RequestEnvelop.GetHatchedEggsMessage({
+    });
+
+    var req = new RequestEnvelop.Requests(126, getHatchedEggs.encode().toBuffer());
+
+    api_req(apiEndpoint, accessToken, req, function (err, f_ret) {
+      if (err) {
+        return callback(err);
+      } else if (!f_ret || !f_ret.payload || !f_ret.payload[0]) {
+        return callback('No result');
+      }
+
+      var dErr, response;
+      try {
+        response = ResponseEnvelop.GetHatchedEggsResponse.decode(f_ret.payload[0]);
+      } catch (err) {
+        dErr = err;
+      }
+      callback(dErr, response);
+    });
+  };
+
+  self.GetBuddyWalked = function (callback) {
+    var _self$playerInfo3 = self.playerInfo;
+    var apiEndpoint = _self$playerInfo3.apiEndpoint;
+    var accessToken = _self$playerInfo3.accessToken;
+
+    var getBuddyWalked = new RequestEnvelop.GetBuddyWalkedMessage({
+    });
+
+    var req = new RequestEnvelop.Requests(153, getBuddyWalked.encode().toBuffer());
+
+    api_req(apiEndpoint, accessToken, req, function (err, f_ret) {
+      if (err) {
+        return callback(err);
+      } else if (!f_ret || !f_ret.payload || !f_ret.payload[0]) {
+        return callback('No result');
+      }
+
+      var dErr, response;
+      try {
+        response = ResponseEnvelop.GetBuddyWalkedResponse.decode(f_ret.payload[0]);
+      } catch (err) {
+        dErr = err;
+      }
+      callback(dErr, response);
+    });
+  };
+
   //still WIP
   self.CatchPokemon = function (mapPokemon, normalizedHitPosition, normalizedReticleSize, spinModifier, pokeball, callback) {
     var _self$playerInfo3 = self.playerInfo;
@@ -598,6 +682,36 @@ function Pokeio() {
     });
 
   };
+
+  /*self.FavoritePokemon = function(pokemonId, favorite, callback) {
+    var favoritePokemonMessage = new RequestEnvelop.SetFavoritePokemonMessage({
+      'pokemon_id': pokemonId,
+      'is_favorite': favorite,
+    });
+
+    var req = new RequestEnvelop.Requests(149, favoritePokemonMessage.encode().toBuffer());
+
+    var _self$playerInfo3 = self.playerInfo;
+    var apiEndpoint = _self$playerInfo3.apiEndpoint;
+    var accessToken = _self$playerInfo3.accessToken;
+
+    api_req(apiEndpoint, accessToken, req, function (err, f_ret) {
+      if (err) {
+        return callback(err);
+      } else if (!f_ret || !f_ret.payload || !f_ret.payload[0]) {
+        return callback('No result');
+      }
+
+      var dErr, response;
+      try {
+        response = ResponseEnvelop.SetFavoritePokemonResponse.decode(f_ret.payload[0]);
+      } catch (err) {
+        dErr = err;
+      }
+      callback(dErr, response);
+    });
+
+  };*/
 
   self.EncounterPokemon = function (catchablePokemon, callback) {
     var _self$playerInfo4 = self.playerInfo;
@@ -728,7 +842,7 @@ function Pokeio() {
 
     var levelUpRewards = new RequestEnvelop.UseItemEggIncubatorMessage({
       'item_id': item_id,
-      'PokemonId': pokemonId
+      'pokemonId': pokemonId
     });
     var req = new RequestEnvelop.Requests(140, levelUpRewards.encode().toBuffer());
 
